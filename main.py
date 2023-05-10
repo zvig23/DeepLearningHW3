@@ -1,16 +1,27 @@
-# This is a sample Python script.
+import numpy as np
+from keras.models import Model
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import ModelLSTM
+import Training
+from Evaluation import load_test_melody, generate_lyrics
+from Preprocessing import load_data, tokenize_lyrics, preprocess_melodies, prepare_training_data
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def main():
+    lyrics, melodies = load_data()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    lyrics_tokenizer, lyrics_sequences = tokenize_lyrics(lyrics)
+    lyrics_vocab_size = len(lyrics_tokenizer.word_index) + 1
+    max_lyrics_length = max(len(sequence) for sequence in lyrics_sequences)
+
+    preprocessed_melodies = preprocess_melodies(melodies)
+
+    model = Training.get_trained_model()
+
+    melody = load_test_melody(preprocessed_melodies=preprocessed_melodies)
+    generated_lyrics = generate_lyrics(model, melody, lyrics_tokenizer, max_lyrics_length)
+
+    print(generated_lyrics)
+
+if __name__ == "__main__":
+    main()
