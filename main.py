@@ -16,10 +16,15 @@ def main():
 
     preprocessed_melodies = preprocess_melodies(melodies)
 
-    model = Training.get_trained_model()
+    model = Training.get_trained_model(max_lyrics_length=max_lyrics_length,
+                      lyrics_sequences=lyrics_sequences,
+                      lyrics_vocab_size=lyrics_vocab_size,
+                      preprocessed_melodies=preprocessed_melodies,
+                      num_epochs=10,
+                      batch_size=5)
 
-    melody = load_test_melody(preprocessed_melodies=preprocessed_melodies)
-    generated_lyrics = generate_lyrics(model, melody, lyrics_tokenizer, max_lyrics_length)
+    lyrics, melodies = load_test_melody()
+    generated_lyrics = generate_lyrics(model, lyrics, lyrics_tokenizer, max_lyrics_length)
 
     print(generated_lyrics)
 

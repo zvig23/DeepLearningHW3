@@ -2,8 +2,11 @@ from keras import Model
 from keras.layers import Input, LSTM, Dense, Embedding, concatenate
 
 
-def get_instance(max_lyrics_length=None, melody_feature_size=None, lyrics_vocab_size=None, embedding_dim=None,
-                 lstm_units=None):  # Define the LSTM model architecture
+def get_instance(max_lyrics_length,
+                 melody_feature_size,
+                 lyrics_vocab_size,
+                 embedding_dim,
+                 lstm_units):  # Define the LSTM model architecture
     lyrics_input = Input(shape=(max_lyrics_length,))
     melody_input = Input(shape=(melody_feature_size,))
     lyrics_embedding = Embedding(lyrics_vocab_size, embedding_dim)(lyrics_input)
