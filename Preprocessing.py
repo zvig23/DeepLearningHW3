@@ -20,7 +20,7 @@ def lyrics_cleaning(lyrics):
 
 
 def load_midi_data(midi_file_path):
-    return pretty_midi.PrettyMIDI(midi_file_path)
+    return pretty_midi.PrettyMIDI(midi_file_path,)
 
 
 def load_data():

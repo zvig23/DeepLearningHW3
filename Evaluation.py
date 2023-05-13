@@ -1,17 +1,17 @@
-
-
 # Load a test melody for generating lyrics
+import numpy as np
 import pandas as pd
+from keras.utils import pad_sequences
 
-from Preprocessing import get_mid_file_path, load_midi_data, lyrics_cleaning
+from Preprocessing import get_mid_file_path, load_midi_data, lyrics_cleaning, prepare_training_data
 
 
 def load_test_melody():
     # Load and preprocess the lyrics and melodies data
     lyrics, melodies = [], []
-    songs_df = pd.read_csv("data/lyrics_test_set.csv", header=None)
+    songs_df = pd.read_csv("data/lyrics_train_set.csv", header=None)
     for idx, row in songs_df.iterrows():
-        midi_file_path = get_mid_file_path(row).replace("__","_")
+        midi_file_path = get_mid_file_path(row).replace("__", "_")
         midi_data = load_midi_data(midi_file_path)
 
         clean_lyrics = lyrics_cleaning(row[2])
@@ -23,7 +23,15 @@ def load_test_melody():
             break
     return lyrics, melodies
 
+
 # Generate lyrics for a given melody
-def generate_lyrics(model, melody, lyrics_tokenizer, max_lyrics_length):
-    generated_lyrics=["dvir"]
+def generate_lyrics(model, lyrics_sequences, preprocessed_melodies, lyrics_vocab_size, lyrics_tokenizer):
+    generated_lyrics_ids = []
+    input_lyrics, input_melodies, output_data = prepare_training_data(lyrics_sequences, preprocessed_melodies,
+                                                                      lyrics_vocab_size)
+    generated_lyrics = model.predict([input_lyrics, input_melodies])
+    for generated_lyric in generated_lyrics:
+        next_token_id = np.argmax(generated_lyric)
+        generated_lyrics_ids.append(next_token_id)
+    generated_lyrics = lyrics_tokenizer.sequences_to_texts([generated_lyrics_ids])
     return generated_lyrics
