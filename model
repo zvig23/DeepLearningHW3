@@ -1,22 +1,24 @@
+19/19 [==============================] - 6s 236ms/step - loss: 57054.0547
 Model: "model"
 __________________________________________________________________________________________________
- Layer (type)                   Output Shape         Param #     Connected to
+ Layer (type)                   Output Shape         Param #     Connected to                     
 ==================================================================================================
- input_1 (InputLayer)           [(None, 404)]        0           []
-
- embedding (Embedding)          (None, 404, 100)     48200       ['input_1[0][0]']
-
- lstm (LSTM)                    (None, 10)           4440        ['embedding[0][0]']
-
- input_2 (InputLayer)           [(None, 153)]        0           []
-
- concatenate (Concatenate)      (None, 163)          0           ['lstm[0][0]',
-                                                                  'input_2[0][0]']
-
- dense (Dense)                  (None, 482)          79048       ['concatenate[0][0]']
-
+ input_1 (InputLayer)           [(None, 404)]        0           []                               
+                                                                                                  
+ embedding (Embedding)          (None, 404, 300)     144600      ['input_1[0][0]']                
+                                                                                                  
+ lstm (LSTM)                    (None, 10)           12440       ['embedding[0][0]']              
+                                                                                                  
+ input_2 (InputLayer)           [(None, 153)]        0           []                               
+                                                                                                  
+ concatenate (Concatenate)      (None, 163)          0           ['lstm[0][0]',                   
+                                                                  'input_2[0][0]']                
+                                                                                                  
+ dense (Dense)                  (None, 482)          79048       ['concatenate[0][0]']            
+                                                                                                  
 ==================================================================================================
-Total params: 131,688
-Trainable params: 131,688
+Total params: 236,088
+Trainable params: 236,088
 Non-trainable params: 0
 __________________________________________________________________________________________________
+None

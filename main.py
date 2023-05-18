@@ -16,14 +16,16 @@ def main():
                                        lyrics_sequences=lyrics_sequences,
                                        lyrics_vocab_size=lyrics_vocab_size,
                                        preprocessed_melodies=preprocessed_melodies,
-                                       num_epochs=2,
-                                       batch_size=5)
+                                       num_epochs=1,
+                                       batch_size=128)
 
     # lyrics, melodies = load_test_melody()
-    generated_lyrics = generate_lyrics(model, lyrics_sequences, preprocessed_melodies, lyrics_vocab_size,
-                                       lyrics_tokenizer)
+    context, generated_lyrics = generate_lyrics(model, lyrics_sequences, preprocessed_melodies, lyrics_vocab_size,
+                                                lyrics_tokenizer, max_lyrics_length)
 
-    print(generated_lyrics)
+    for i in range(len(context)):
+        print("context: " + context[i])
+        print("next phrase: "+ generated_lyrics[i])
 
 
 if __name__ == "__main__":
