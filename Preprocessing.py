@@ -36,7 +36,7 @@ def load_data():
 
         melodies.append(midi_data)
 
-        if idx > 5:
+        if idx > 100:
             break
     return lyrics, melodies
 
@@ -90,18 +90,15 @@ def prepare_training_data(lyrics_sequences, preprocessed_melodies, lyrics_vocab_
     input_melodies = []
     output_data = []
 
-    for i in range(len(lyrics_sequences) - 1):
+    for i in range(len(lyrics_sequences)):
         curr_sequence = lyrics_sequences[i]
-        for n_gram_size in range(1, curr_sequence.shape[0]):
-            context = [curr_sequence[0:n_gram_size]]
-            rest_lyrics = [curr_sequence[n_gram_size + 1: len(curr_sequence)]]
-            input_sequence = pad_sequences(context, maxlen=len(lyrics_sequences[i]), padding='post')
-            output_sequence = pad_sequences(rest_lyrics, maxlen=lyrics_vocab_size, padding='pre')
-            input_sequence = input_sequence.squeeze()
-            output_sequence = output_sequence.squeeze()
-            input_lyrics.append(input_sequence)
-            input_melodies.append(preprocessed_melodies[i])
-            output_data.append(output_sequence)
+        context = [curr_sequence[0:1]]
+        rest_lyrics = [curr_sequence[1: len(curr_sequence)]]
+        input_sequence = pad_sequences(context, maxlen=len(lyrics_sequences[i]), padding='post').squeeze()
+        output_sequence = pad_sequences(rest_lyrics, maxlen=lyrics_vocab_size, padding='pre').squeeze()
+        input_lyrics.append(input_sequence)
+        input_melodies.append(preprocessed_melodies[i])
+        output_data.append(output_sequence)
 
     # Convert the input and output data to numpy arrays
     input_lyrics = np.array(input_lyrics)
