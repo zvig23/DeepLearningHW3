@@ -1,3 +1,4 @@
+import logging
 import re
 
 import numpy as np
@@ -7,6 +8,7 @@ import pandas as pd
 import mido.midifiles.meta as meta
 from keras.preprocessing.text import Tokenizer
 from keras.utils import pad_sequences
+from tqdm import tqdm
 
 del meta._META_SPECS[0x59]
 del meta._META_SPEC_BY_TYPE['key_signature']
@@ -20,24 +22,28 @@ def lyrics_cleaning(lyrics):
 
 
 def load_midi_data(midi_file_path):
-    return pretty_midi.PrettyMIDI(midi_file_path,)
+    return pretty_midi.PrettyMIDI(midi_file_path)
 
 
 def load_data():
     # Load and preprocess the lyrics and melodies data
     lyrics, melodies = [], []
     songs_df = pd.read_csv("data/lyrics_train_set.csv", header=None)
-    for idx, row in songs_df.iterrows():
-        midi_file_path = get_mid_file_path(row)
-        midi_data = load_midi_data(midi_file_path)
+    print("load_data start")
+    with tqdm(range(len(songs_df.index))) as pbar:
+        for idx, row in songs_df.iterrows():
+            pbar.update()
+            try:
+                midi_file_path = get_mid_file_path(row)
+                midi_data = load_midi_data(midi_file_path)
 
-        clean_lyrics = lyrics_cleaning(row[2])
-        lyrics.append(clean_lyrics)
+                clean_lyrics = lyrics_cleaning(row[2])
+                lyrics.append(clean_lyrics)
 
-        melodies.append(midi_data)
-
-        if idx > 100:
-            break
+                melodies.append(midi_data)
+            except:
+                continue
+    print("load_data finish")
     return lyrics, melodies
 
 
@@ -56,14 +62,19 @@ def tokenize_lyrics(lyrics):
     lyrics_sequences = lyrics_tokenizer.texts_to_sequences(lyrics)
     max_lyrics_length = max(len(sequence) for sequence in lyrics_sequences)
     lyrics_sequences = pad_sequences(lyrics_sequences, maxlen=max_lyrics_length, padding='post')
-    return lyrics_tokenizer, lyrics_sequences
+    return lyrics_tokenizer, lyrics_sequences, lyrics_tokenizer
 
 
 # Preprocess the melodies
 def preprocess_melodies(melodies):
     preprocessed_melodies = []
-    for melody_file in melodies:
-        preprocessed_melodies.append(preprocess_melody(melody_file))
+    print("preprocess_melodies start")
+    with tqdm(range(len(melodies))) as pbar:
+        for melody_file in melodies:
+            pbar.update()
+            preprocessed_melodies.append(preprocess_melody(melody_file))
+    print("preprocess_melodies done")
+
     return preprocessed_melodies
 
 
@@ -89,20 +100,24 @@ def prepare_training_data(lyrics_sequences, preprocessed_melodies, lyrics_vocab_
     input_lyrics = []
     input_melodies = []
     output_data = []
+    print("prepare_training_data start")
 
-    for i in range(len(lyrics_sequences)):
-        curr_sequence = lyrics_sequences[i]
-        context = [curr_sequence[0:1]]
-        rest_lyrics = [curr_sequence[1: len(curr_sequence)]]
-        input_sequence = pad_sequences(context, maxlen=len(lyrics_sequences[i]), padding='post').squeeze()
-        output_sequence = pad_sequences(rest_lyrics, maxlen=lyrics_vocab_size, padding='pre').squeeze()
-        input_lyrics.append(input_sequence)
-        input_melodies.append(preprocessed_melodies[i])
-        output_data.append(output_sequence)
+    with tqdm(range(len(lyrics_sequences))) as pbar:
+        for i in range(len(lyrics_sequences)):
+            pbar.update()
+            curr_sequence = lyrics_sequences[i]
+            context = [curr_sequence[0:1]]
+            rest_lyrics = [curr_sequence[1: len(curr_sequence)]]
+            input_sequence = pad_sequences(context, maxlen=max_lyrics_length, padding='post').squeeze()
+            output_sequence = pad_sequences(rest_lyrics, maxlen=max_lyrics_length, padding='pre').squeeze()
+            input_lyrics.append(input_sequence)
+            input_melodies.append(preprocessed_melodies[i])
+            output_data.append(output_sequence)
 
     # Convert the input and output data to numpy arrays
     input_lyrics = np.array(input_lyrics)
     input_melodies = np.array(input_melodies)
     output_data = np.array(output_data)
+    print("prepare_training_data done")
 
     return input_lyrics, input_melodies, output_data

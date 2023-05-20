@@ -9,18 +9,18 @@ from Preprocessing import get_mid_file_path, load_midi_data, lyrics_cleaning, pr
 def load_test_melody():
     # Load and preprocess the lyrics and melodies data
     lyrics, melodies = [], []
-    songs_df = pd.read_csv("data/lyrics_train_set.csv", header=None)
+    songs_df = pd.read_csv("data/lyrics_test_set.csv", header=None)
     for idx, row in songs_df.iterrows():
-        midi_file_path = get_mid_file_path(row).replace("__", "_")
-        midi_data = load_midi_data(midi_file_path)
+        try:
+            midi_file_path = get_mid_file_path(row).replace("__", "_")
+            midi_data = load_midi_data(midi_file_path)
 
-        clean_lyrics = lyrics_cleaning(row[2])
-        lyrics.append(clean_lyrics)
+            clean_lyrics = lyrics_cleaning(row[2])
+            lyrics.append(clean_lyrics)
 
-        melodies.append(midi_data)
-
-        if idx > 5:
-            break
+            melodies.append(midi_data)
+        except:
+            continue
     return lyrics, melodies
 
 
@@ -32,8 +32,6 @@ def generate_lyrics(model, lyrics_sequences, preprocessed_melodies, lyrics_vocab
                                                                       lyrics_vocab_size, max_lyrics_length)
     generated_lyrics = model.predict([input_lyrics, input_melodies])
     for generated_lyric in generated_lyrics:
-        next_token_id = np.argmax(generated_lyric)
-        generated_lyrics_ids.append(next_token_id)
+        generated_lyrics_ids.append(lyrics_tokenizer.sequences_to_texts([np.argpartition(generated_lyric, -max_lyrics_length)[-max_lyrics_length:]]))
     contexts = lyrics_tokenizer.sequences_to_texts(input_lyrics)
-    generated_lyrics = lyrics_tokenizer.sequences_to_texts([generated_lyrics_ids])
-    return contexts, str(generated_lyrics[0]).split(" ")
+    return contexts, generated_lyrics_ids
