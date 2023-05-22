@@ -16,7 +16,7 @@ def load_word_embeddings(file_path):
 
 
 def create_embadding_matrix(lyrics_vocab_size, word_index=None):
-    word_embeddings = load_word_embeddings('data/wiki-news-300d-1M.vec')
+    word_embeddings = load_word_embeddings('../DeepLearningHW3/data/wiki-news-300d-1M.vec')
     embedding_dim = 300
     embedding_matrix = np.zeros((lyrics_vocab_size, embedding_dim))
     for word, i in word_index.items():
@@ -31,7 +31,9 @@ def create_embadding_matrix(lyrics_vocab_size, word_index=None):
 def get_instance(lyrics_input_shape,
                  melody_feature_size,
                  lyrics_vocab_size,
-                 lstm_units, word_index):  # Define the LSTM model architecture
+                 lstm_units,
+                 word_index,
+                 max_lyrics_length):  # Define the LSTM model architecture
     lyrics_input = Input(shape=(lyrics_input_shape,))
     melody_input = Input(shape=(melody_feature_size,))
 
@@ -40,10 +42,9 @@ def get_instance(lyrics_input_shape,
     lstm_output = LSTM(lstm_units)(lyrics_embedding)
     fusion_output = concatenate([lstm_output, melody_input])
     dropout_l = Dropout(0.6)(fusion_output)
-
-    output = Dense(lyrics_vocab_size, activation='softmax')(dropout_l)
+    output = Dense(max_lyrics_length, activation='linear')(dropout_l)
     model = Model(inputs=[lyrics_input, melody_input], outputs=output)
 
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(loss='mean_absolute_error', optimizer='adagrad', metrics=['mae'])
 
     return model

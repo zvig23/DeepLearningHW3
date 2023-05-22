@@ -15,11 +15,12 @@ def get_trained_model(max_lyrics_length,
                                    melody_feature_size=len(input_melodies[0]),
                                    lyrics_vocab_size=lyrics_vocab_size,
                                    lstm_units=1000,
-                                   word_index=word_index)
+                                   word_index=word_index,
+                                   max_lyrics_length=max_lyrics_length)
     rlop = ReduceLROnPlateau(min_delta=0.01)
     mcp = ModelCheckpoint('model_checkpoint.h5', save_best_only=True)
     tensorboard_callback = TensorBoard(log_dir="logs", histogram_freq=1)
-    model.fit([input_lyrics, input_melodies], output_data, epochs=5, batch_size=32,
-              validation_split=0.1, verbose=1, callbacks=[rlop, mcp, tensorboard_callback])
+    model.fit([input_lyrics.squeeze(), input_melodies], output_data, epochs=10, batch_size=64,
+              validation_split=0.2, verbose=1, callbacks=[rlop, mcp, tensorboard_callback])
 
     return model
