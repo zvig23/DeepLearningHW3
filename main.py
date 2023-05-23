@@ -22,7 +22,7 @@ def main():
         pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
     lyrics_vocab_size = len(lyrics_tokenizer.word_index) + 1
     max_lyrics_length = max(len(sequence) for sequence in lyrics_sequences)
-    lyrics_sequences= lyrics_sequences
+    lyrics_sequences = lyrics_sequences
     preprocessed_melodies = preprocess_melodies(melodies)
 
     model = Training.get_trained_model(max_lyrics_length=max_lyrics_length,
@@ -32,8 +32,9 @@ def main():
                                        word_index=lyrics_tokenizer.word_index)
     model.save('model_checkpoint_2.h5')
 
+
 if __name__ == "__main__":
-    main()
+    # main()
     model = keras.models.load_model('model_checkpoint_2.h5')
     # loading
     tokenizer = []
@@ -50,14 +51,15 @@ if __name__ == "__main__":
     context = context[0].split(" ")
     contexts, generated, originl = [], [], []
     for i in range(len(context)):
-        curr_context = context[i]
+        curr_lyrics = lyrics[math.floor(i / 5)]
+        curr_context = curr_lyrics.split(" ")[0:4]
         contexts.append(curr_context)
         generated.append(generated_lyrics[i])
-        originl.append(" ".join(lyrics[math.floor(i/4)].split(" ")[1:len(lyrics[math.floor(i/4)])]))
+        originl.append(curr_lyrics)
     results_test = pd.DataFrame(
         {'contexts': contexts,
          'generated': generated,
          'originl': originl
          })
     print(results_test)
-    results_test.to_csv("results/shit_train_results.csv")
+    results_test.to_csv("results/test_results.csv")

@@ -107,13 +107,14 @@ def prepare_training_data(lyrics_sequences, preprocessed_melodies, lyrics_vocab_
         for i in range(len(lyrics_sequences)):
             pbar.update()
             curr_sequence = lyrics_sequences[i]
-            context = [curr_sequence[0:3]]
-            rest_lyrics = [curr_sequence[3: len(curr_sequence)]]
+            context = [curr_sequence[0:4]]
+            rest_lyrics = [curr_sequence[4: len(curr_sequence)]]
             input_sequence = pad_sequences(context, maxlen=max_lyrics_length, padding='post')
             output_sequence = pad_sequences(rest_lyrics, maxlen=max_lyrics_length, padding='pre')
-            input_lyrics.append(input_sequence)
-            input_melodies.append(preprocessed_melodies[i])
-            output_data.append(output_sequence)
+            for preprocessed_melody in preprocessed_melodies:
+                input_lyrics.append(input_sequence)
+                input_melodies.append(preprocessed_melody)
+                output_data.append(output_sequence)
 
     # Convert the input and output data to numpy arrays
     input_lyrics = np.array(input_lyrics)
