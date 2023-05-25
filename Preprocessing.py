@@ -119,7 +119,7 @@ def prepare_training_data(lyrics_sequences, preprocessed_melodies, lyrics_vocab_
     # Convert the input and output data to numpy arrays
     input_lyrics = np.array(input_lyrics)
     input_melodies = np.array(input_melodies)
-    output_data = np.array(output_data)/lyrics_vocab_size
+    output_data = np.array(output_data) / lyrics_vocab_size
     print("prepare_training_data done")
 
     return input_lyrics, input_melodies, output_data

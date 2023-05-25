@@ -39,8 +39,8 @@ def generate_lyrics(model, lyrics_sequences, preprocessed_melodies, lyrics_vocab
 
     # Generate random values in the desired range
     random_array = np.random.rand(*generated_lyrics.shape) * upper_bound
-    generated_lyrics+=random_array
-    generated_lyrics*=lyrics_vocab_size
+    generated_lyrics += random_array
+    generated_lyrics *= lyrics_vocab_size
     for song_id in range(len(input_lyrics)):
         curr_song_context = input_lyrics[song_id]
         contexts[song_id] = input_lyrics[song_id][0][0]

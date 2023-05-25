@@ -34,9 +34,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
     model = keras.models.load_model('model_checkpoint_2.h5')
-    # loading
     tokenizer = []
     with open('tokenizer.pickle', 'rb') as handle:
         tokenizer = pickle.load(handle)
